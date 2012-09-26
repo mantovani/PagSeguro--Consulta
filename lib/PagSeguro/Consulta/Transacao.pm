@@ -1,13 +1,45 @@
 package PagSeguro::Consulta::Transacao;
+use Class::C3;
+
+our $VERSION = '0.01';
 
 use 5.006;
 use strict;
 use warnings;
 
+use base qw/PagSeguro::Consulta::Transacao::Role/;
 
+use PagSeguro::Consulta::Agent;
 
+sub new {
+    my $class = shift;
+    my $ref   = {
+        agent => PagSeguro::Consulta::Agent->new;
+    };
+    return bless $ref, $class;
+}
 
-our $VERSION = '0.01';
+sub agent { shift->{agent} }
+
+sub fetch {
+    my ( $self, $params ) = @_;
+    $self->_check_params($params);
+    my $url = $self->params($params);
+    return $self->agent->request( { method => 'GET', url => $url } );
+}
+
+sub _check_params {
+    my ( $self, $params ) = @_;
+    my %valid = map { $_ => 1 } $self->_allow_params;
+
+    die "invalid params" if keys %{$params} > @valid;
+
+    foreach my $param ( keys %{$params} ) {
+        die "invalid param {$param}"
+          unless $valid{$param};
+    }
+}
+
 
 42;
 
@@ -25,14 +57,18 @@ Version 0.01
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
+API to interact with L<http://www.pagseguro.com.br>
 
     use PagSeguro::Consulta::Transacao;
 
     my $foo = PagSeguro::Consulta::Transacao->new();
-    ...
+    my $xml = $foo->fetch({
+		initialDate => 'timestamp',
+		finalDate => 'timestamp',
+		maxPageResults => 1000,
+		email => 'foo@foo.com'
+		token => 'your token'
+	});
 
 =head1 METHODS
 
