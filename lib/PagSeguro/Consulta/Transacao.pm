@@ -13,9 +13,7 @@ use PagSeguro::Consulta::Agent;
 
 sub new {
     my $class = shift;
-    my $ref   = {
-        agent => PagSeguro::Consulta::Agent->new;
-    };
+    my $ref = { agent => PagSeguro::Consulta::Agent->new };
     return bless $ref, $class;
 }
 
@@ -32,14 +30,11 @@ sub _check_params {
     my ( $self, $params ) = @_;
     my %valid = map { $_ => 1 } $self->_allow_params;
 
-    die "invalid params" if keys %{$params} > @valid;
-
     foreach my $param ( keys %{$params} ) {
         die "invalid param {$param}"
           unless $valid{$param};
     }
 }
-
 
 42;
 
@@ -61,14 +56,16 @@ API to interact with L<http://www.pagseguro.com.br>
 
     use PagSeguro::Consulta::Transacao;
 
-    my $foo = PagSeguro::Consulta::Transacao->new();
-    my $xml = $foo->fetch({
-		initialDate => 'timestamp',
-		finalDate => 'timestamp',
-		maxPageResults => 1000,
-		email => 'foo@foo.com'
-		token => 'your token'
-	});
+	my $foo = PagSeguro::Consulta::Transacao->new();
+	my $xml = $foo->fetch(
+		{
+	        initialDate    => 1341100800,
+	        finalDate      => 1343779200,
+	        maxPageResults => 1000,
+	        email          => '',
+	        token          => ''
+	    }
+	);
 
 =head1 METHODS
 

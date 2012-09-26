@@ -9,31 +9,27 @@ use warnings;
 
 use URI;
 use DateTime;
+use Data::Dumper;
 
 sub _allow_params {
     return qw/initialDate finalDate page maxPageResults email token/;
 }
 
 sub _struct {
-    my ( $self, $params ) = shift;
+    my ( $self, $params ) = @_;
     my $struct = {};
     foreach my $param ( $self->_allow_params ) {
         my $method = '_' . $param;
-        $struct->{$params} = $self->$method( $params->{$param} );
+        $struct->{$param} = $self->$method( $params->{$param} );
     }
     return $struct;
 }
 
-sub uri {
-    my $self = shift;
-    my $u    = URI->new("https://ws.pagseguro.uol.com.br/v2/transactions");
-    return $u;
-}
-
 sub params {
     my ( $self, $params ) = @_;
-    $self->uri->query_form( { $self->_struct($params) } );
-    return $self->uri->abs;
+    my $u = URI->new("https://ws.pagseguro.uol.com.br/v2/transactions");
+    $u->query_form( $self->_struct($params) );
+    return $u->as_string;
 }
 
 sub _initialDate {
@@ -48,7 +44,7 @@ sub _finalDate {
 
 sub _date_format {
     my ( $self, $timestamp ) = @_;
-    my $dt = DateTime->from_epoch($timestamp);
+    my $dt = DateTime->from_epoch( epoch => $timestamp );
     return $dt->ymd('-') . 'T' . $dt->hour . ':' . $dt->minute;
 }
 
@@ -80,6 +76,7 @@ sub _email {
 sub _token {
     my ( $self, $attr ) = @_;
     if ( length $attr != 32 ) { die "invalid token" }
+    return $attr;
 }
 
 return 42;
