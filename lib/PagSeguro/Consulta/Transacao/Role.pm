@@ -45,7 +45,15 @@ sub _finalDate {
 sub _date_format {
     my ( $self, $timestamp ) = @_;
     my $dt = DateTime->from_epoch( epoch => $timestamp );
-    return $dt->ymd('-') . 'T' . $dt->hour . ':' . $dt->minute;
+    return
+        $dt->ymd('-') . 'T'
+      . $self->_format_dt( $dt->hour ) . ':'
+      . $self->_format_dt( $dt->minute );
+}
+
+sub _format_dt {
+    my ( $self, $n ) = @_;
+    return sprintf( "%02d", $n );
 }
 
 sub _page {
